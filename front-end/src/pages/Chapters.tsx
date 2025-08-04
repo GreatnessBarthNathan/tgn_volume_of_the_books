@@ -69,7 +69,7 @@ function Chapters() {
                   {chapter.name} "{chapter.word}"
                 </Link>
                 <button
-                  disabled
+                  // disabled
                   onClick={() => mutate(`${chapter.book}-${chapter.name}`)}
                   className='text-xs'
                 >

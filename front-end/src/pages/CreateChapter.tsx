@@ -79,7 +79,7 @@ function CreateChapter() {
             value={declaration}
             onChange={(e) => setDeclaration(e.target.value)}
             required
-            className='uppercase border p-1 w-full border-[var(--primaryColor)] rounded-sm outline-none'
+            className='border p-1 w-full border-[var(--primaryColor)] rounded-sm outline-none'
           ></textarea>
         </div>
 
