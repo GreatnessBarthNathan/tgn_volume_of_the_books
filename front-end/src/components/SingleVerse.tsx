@@ -1,18 +1,20 @@
 import { useEffect } from "react"
-import { FaEdit } from "react-icons/fa"
-import { FaTrash } from "react-icons/fa6"
-import { Link } from "react-router-dom"
+// import { FaEdit } from "react-icons/fa"
+// import { FaTrash } from "react-icons/fa6"
+// import { Link } from "react-router-dom"
 import { VerseType } from "../utils/types"
 import { useDeleteVerse } from "../queries/verses"
 import { toast } from "react-toastify"
 import { isAxiosError } from "axios"
 
 function SingleVerse({ index, _id, date, prophecy }: VerseType) {
-  const { mutate, isSuccess, isError, error } = useDeleteVerse()
+  const { 
+    // mutate,
+     isSuccess, isError, error } = useDeleteVerse()
 
-  const deleteVerse = () => {
-    mutate(_id)
-  }
+  // const deleteVerse = () => {
+  //   mutate(_id)
+  // }
 
   const responses = () => {
     if (isSuccess) {
@@ -37,12 +39,12 @@ function SingleVerse({ index, _id, date, prophecy }: VerseType) {
           }).format(new Date(date as string))}
         </span>
         <span className='flex justify-center space-x-5'>
-          <Link to={`/edit-verse/${_id}`}>
+          {/* <Link to={`/edit-verse/${_id}`}>
             <FaEdit />
-          </Link>
-          <button onClick={deleteVerse} disabled>
+          </Link> */}
+          {/* <button onClick={deleteVerse} disabled>
             <FaTrash />
-          </button>
+          </button> */}
         </span>
       </div>
       <p className='mb-3 text-[var(--primaryText)] text-xs md:text-base whitespace-pre-wrap'>

@@ -1,14 +1,16 @@
 import { Link } from "react-router-dom"
-import { useDeleteBook, useGetBooks } from "../queries/books"
+import {
+  //  useDeleteBook, 
+   useGetBooks } from "../queries/books"
 import { BookType } from "../utils/types"
-import { FaEdit } from "react-icons/fa"
-import { FaTrash } from "react-icons/fa6"
+// import { FaEdit } from "react-icons/fa"
+// import { FaTrash } from "react-icons/fa6"
 import Loading from "../components/Loading"
 
 function Books() {
   const { data, isLoading, isError } = useGetBooks()
 
-  const { mutate } = useDeleteBook()
+  // const { mutate } = useDeleteBook()
 
   if (isError) return <h2 className='text-center'>There was an error</h2>
 
@@ -38,22 +40,22 @@ function Books() {
                 key={book._id}
                 className='mb-2 bg-[var(--primaryColor)] text-center text-white p-2 font-bold flex justify-between items-center text-xs md:text-base'
               >
-                <Link to={`/edit-book/${book.year}`}>
+                {/* <Link to={`/edit-book/${book.year}`}>
                   <FaEdit />
-                </Link>
+                </Link> */}
                 <Link
                   to={`/books/${book.year}`}
                   className='uppercase text-xs md:text-base hover:text-[var(--hoverColor)]'
                 >
                   {book.year} "{book.word}"
                 </Link>
-                <button
+                {/* <button
                   onClick={() => mutate(Number(book.year))}
                   className='text-xs md:text-base'
                   disabled
                 >
                   <FaTrash />
-                </button>
+                </button> */}
               </div>
             )
           })}

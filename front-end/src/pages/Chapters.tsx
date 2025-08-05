@@ -3,8 +3,8 @@ import { Link, useParams, useNavigate } from "react-router-dom"
 import { useDeleteChapter, useGetChapters } from "../queries/chapters"
 import { ChapterType } from "../utils/types"
 import { useGetBook } from "../queries/books"
-import { FaEdit } from "react-icons/fa"
-import { FaTrash } from "react-icons/fa6"
+// import { FaEdit } from "react-icons/fa"
+// import { FaTrash } from "react-icons/fa6"
 import Loading from "../components/Loading"
 
 function Chapters() {
@@ -16,7 +16,9 @@ function Chapters() {
 
   const { data, isError, isLoading } = useGetChapters(Number(year))
 
-  const { mutate, isSuccess, isError: deleteError, error } = useDeleteChapter()
+  const { 
+    // mutate, 
+    isSuccess, isError: deleteError, error } = useDeleteChapter()
 
   const responses = () => {
     if (isSuccess) {
@@ -56,25 +58,25 @@ function Chapters() {
                 key={chapter._id}
                 className='mb-2 bg-[var(--primaryColor)] text-center text-white p-2  font-bold flex justify-between items-center text-sm md:text-base'
               >
-                <Link
+                {/* <Link
                   to={`/edit-chapter/${chapter.book}-${chapter.name}`}
                   className='text-xs md:text-base hover:text-[var(--hoverColor)]'
                 >
                   <FaEdit />
-                </Link>
+                </Link> */}
                 <Link
                   to={`/verses/${year}-${chapter.name}`}
                   className='hover:text-[var(--hoverColor)] capitalize text-xs'
                 >
                   {chapter.name} "{chapter.word}"
                 </Link>
-                <button
+                {/* <button
                   // disabled
                   onClick={() => mutate(`${chapter.book}-${chapter.name}`)}
                   className='text-xs'
                 >
                   <FaTrash />
-                </button>
+                </button> */}
               </div>
             )
           })}
