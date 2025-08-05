@@ -38,15 +38,14 @@ function Books() {
             return (
               <div
                 key={book._id}
-                className='mb-2 bg-[var(--primaryColor)] text-center text-white p-2 font-bold flex justify-between items-center text-xs md:text-base'
+                className='mb-2 bg-[var(--primaryColor)] text-center text-white p-2 font-bold flex justify-center items-center text-xs md:text-base'
               >
                 {/* <Link to={`/edit-book/${book.year}`}>
                   <FaEdit />
                 </Link> */}
                 <Link
                   to={`/books/${book.year}`}
-                  // className='uppercase text-xs md:text-base hover:text-[var(--hoverColor)]'
-                  className='text-center uppercase text-xs md:text-base hover:text-[var(--hoverColor)]'
+                  className='uppercase text-xs md:text-base hover:text-[var(--hoverColor)]'
                 >
                   {book.year} "{book.word}"
                 </Link>

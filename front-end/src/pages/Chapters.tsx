@@ -56,7 +56,7 @@ function Chapters() {
             return (
               <div
                 key={chapter._id}
-                className='mb-2 bg-[var(--primaryColor)] text-center text-white p-2  font-bold flex justify-between items-center text-sm md:text-base'
+                className='mb-2 bg-[var(--primaryColor)] text-center text-white p-2  font-bold flex justify-center items-center text-sm md:text-base'
               >
                 {/* <Link
                   to={`/edit-chapter/${chapter.book}-${chapter.name}`}
@@ -66,8 +66,7 @@ function Chapters() {
                 </Link> */}
                 <Link
                   to={`/verses/${year}-${chapter.name}`}
-                  // className='hover:text-[var(--hoverColor)] capitalize text-xs'
-                  className='text-center hover:text-[var(--hoverColor)] capitalize text-xs'
+                  className='hover:text-[var(--hoverColor)] capitalize text-xs'
                 >
                   {chapter.name} "{chapter.word}"
                 </Link>
