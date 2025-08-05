@@ -66,7 +66,8 @@ function Chapters() {
                 </Link> */}
                 <Link
                   to={`/verses/${year}-${chapter.name}`}
-                  className='hover:text-[var(--hoverColor)] capitalize text-xs'
+                  // className='hover:text-[var(--hoverColor)] capitalize text-xs'
+                  className='text-center hover:text-[var(--hoverColor)] capitalize text-xs'
                 >
                   {chapter.name} "{chapter.word}"
                 </Link>

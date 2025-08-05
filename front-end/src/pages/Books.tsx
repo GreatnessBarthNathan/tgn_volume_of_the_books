@@ -45,7 +45,8 @@ function Books() {
                 </Link> */}
                 <Link
                   to={`/books/${book.year}`}
-                  className='uppercase text-xs md:text-base hover:text-[var(--hoverColor)]'
+                  // className='uppercase text-xs md:text-base hover:text-[var(--hoverColor)]'
+                  className='text-center uppercase text-xs md:text-base hover:text-[var(--hoverColor)]'
                 >
                   {book.year} "{book.word}"
                 </Link>
