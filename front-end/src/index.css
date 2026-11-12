@@ -35,6 +35,10 @@
   --shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
 }
 
+:root[data-theme="dark"] .brand-mark {
+  background: #fff;
+}
+
 * {
   box-sizing: border-box;
 }

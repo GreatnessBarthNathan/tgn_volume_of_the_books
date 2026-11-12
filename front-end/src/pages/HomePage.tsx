@@ -7,9 +7,7 @@ function HomePage() {
   const [theme, setTheme] = useState<"light" | "dark">(() => {
     const savedTheme = window.localStorage.getItem("volume-theme")
     if (savedTheme === "light" || savedTheme === "dark") return savedTheme
-    return window.matchMedia("(prefers-color-scheme: dark)").matches
-      ? "dark"
-      : "light"
+    return "light"
   })
 
   useEffect(() => {
