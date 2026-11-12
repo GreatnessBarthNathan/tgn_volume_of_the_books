@@ -1,17 +1,19 @@
-import { Request, Response, NextFunction, ErrorRequestHandler } from "express"
+import { Request, Response, ErrorRequestHandler } from "express"
 import { StatusCodes } from "http-status-codes"
 
 // Custom Error Handler Middleware
 const errorHandler: ErrorRequestHandler = (
   err: any, // Use `any` because errors can have varying structures
-  req: Request,
-  res: Response,
-  next: NextFunction
+  _req: Request,
+  res: Response
 ): void => {
   // Default custom error structure
   const customError = {
     statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-    msg: err.message || "Something went wrong, please try again later",
+    msg:
+      err.statusCode && err.message
+        ? err.message
+        : "Something went wrong, please try again later",
   }
 
   // Handle Mongoose Duplicate Key Error
@@ -32,9 +34,6 @@ const errorHandler: ErrorRequestHandler = (
 
   // Send error response
   res.status(customError.statusCode).json({ msg: customError.msg })
-
-  // Call `next` in case other middlewares are chained after
-  next()
 }
 
 export default errorHandler

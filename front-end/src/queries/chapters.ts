@@ -29,7 +29,6 @@ export const useSingleChapter = (param: string) => {
     queryKey: ["chapter", param],
     queryFn: () => singleChapter(param),
   })
-  523
 }
 
 export const useEditChapter = () => {

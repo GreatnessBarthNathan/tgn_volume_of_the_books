@@ -10,6 +10,11 @@ import EditVerse from "./pages/EditVerse"
 import EditChapter from "./pages/EditChapter"
 import EditBook from "./pages/EditBook"
 import Error from "./pages/Error"
+import AdminLogin from "./pages/AdminLogin"
+import AdminAccounts from "./pages/AdminAccounts"
+import AdminAcceptInvitation from "./pages/AdminAcceptInvitation"
+import AdminRecovery from "./pages/AdminRecovery"
+import AdminRoute from "./components/AdminRoute"
 
 const router = createBrowserRouter([
   {
@@ -22,24 +27,44 @@ const router = createBrowserRouter([
         element: <Books />,
       },
       {
+        path: "admin/login",
+        element: <AdminLogin />,
+      },
+      {
+        path: "admin/accept-invite",
+        element: <AdminAcceptInvitation />,
+      },
+      {
+        path: "admin/recover",
+        element: <AdminRecovery />,
+      },
+      {
         path: "create-book",
-        element: <CreateBook />,
+        element: (
+          <AdminRoute>
+            <CreateBook />
+          </AdminRoute>
+        ),
       },
       {
         path: "books/:year",
         element: <Chapters />,
       },
       {
-        path: "edit-book/:id",
-        element: <EditBook />,
-      },
-      {
         path: "create-chapter",
-        element: <CreateChapter />,
+        element: (
+          <AdminRoute>
+            <CreateChapter />
+          </AdminRoute>
+        ),
       },
       {
         path: "edit-chapter/:id",
-        element: <EditChapter />,
+        element: (
+          <AdminRoute>
+            <EditChapter />
+          </AdminRoute>
+        ),
       },
       {
         path: "verses/:id",
@@ -47,11 +72,35 @@ const router = createBrowserRouter([
       },
       {
         path: "create-verse",
-        element: <CreateVerse />,
+        element: (
+          <AdminRoute>
+            <CreateVerse />
+          </AdminRoute>
+        ),
       },
       {
         path: "edit-verse/:id",
-        element: <EditVerse />,
+        element: (
+          <AdminRoute>
+            <EditVerse />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "edit-book/:id",
+        element: (
+          <AdminRoute>
+            <EditBook />
+          </AdminRoute>
+        ),
+      },
+      {
+        path: "admin/accounts",
+        element: (
+          <AdminRoute>
+            <AdminAccounts />
+          </AdminRoute>
+        ),
       },
     ],
   },

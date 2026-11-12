@@ -1,41 +1,80 @@
-import { useParams } from "react-router-dom"
+import { useMemo, useState } from "react"
+import { useParams, useSearchParams } from "react-router-dom"
 import { useGetVerses } from "../queries/verses"
 import { VerseType } from "../utils/types"
 import { useSingleChapter } from "../queries/chapters"
-
+import { Link } from "react-router-dom"
+import { FiArrowLeft, FiSearch } from "react-icons/fi"
 import SingleVerse from "../components/SingleVerse"
 import Loading from "../components/Loading"
 
 function Verses() {
   const { id } = useParams()
-  
+  const [searchParams] = useSearchParams()
+  const [search, setSearch] = useState(searchParams.get("search") || "")
+
   const { data: chapter } = useSingleChapter(id as string)
 
   const { data, isError, isLoading } = useGetVerses(id as string)
 
-  if (isError) return <h2>There was an error...</h2>
+  const visibleVerses = useMemo(
+    () =>
+      (data || []).filter((verse: VerseType) =>
+        `${verse.prophecy} ${verse.date}`
+          .toLowerCase()
+          .includes(search.trim().toLowerCase())
+      ),
+    [data, search]
+  )
+
+  if (isError) {
+    return <p className='error-state'>This chapter could not be loaded. Please try again.</p>
+  }
 
   if (isLoading) return <Loading />
 
   return (
-    <div className='mx-5 mb-10'>
+    <div className='mb-10'>
+      <Link to={`/books/${chapter?.book ?? id?.split("-")[0]}`} className='detail-back'>
+        <FiArrowLeft aria-hidden='true' />
+        Back to {chapter?.book ?? "volume"}
+      </Link>
       {chapter && (
-        <div>
-          <h1 className='uppercase text-center font-bold font-sans italic text-[var(--primaryColor)] text-sm md:text-2xl'>
-            {chapter.name}, {chapter.book} : Month of {chapter.word}
-          </h1>
-          <p className='capitalize text-center italic font-semibold md:w-[50%] m-auto my-3 text-xs md:text-base text-[var(--primaryText)] whitespace-pre-wrap'>
-            "{chapter.declaration}"
+        <section className='detail-heading'>
+          <span className='section-eyebrow'>
+            {chapter.name} · {chapter.book}
+          </span>
+          <h1 className='detail-title'>{chapter.word}</h1>
+          <p className='detail-copy'>{chapter.declaration}</p>
+          <p className='archive-count'>
+            {data?.length ?? 0} {(data?.length ?? 0) === 1 ? "verse" : "verses"}
           </p>
-        </div>
+        </section>
       )}
-      {!data.length ? (
-        <h1 className='text-center mt-2'>No verses to display</h1>
+      <div className='verse-toolbar'>
+        <span className='section-eyebrow'>Words for reflection</span>
+        <label className='search-control'>
+          <FiSearch aria-hidden='true' />
+          <span className='sr-only'>Search verses</span>
+          <input
+            type='search'
+            placeholder='Search this chapter'
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+        </label>
+      </div>
+      {!visibleVerses.length ? (
+        <p className='empty-state'>
+          {search
+            ? "No verses match your search."
+            : "No verses have been added to this chapter yet."}
+        </p>
       ) : (
-        <div>
-          {data.map((verse: VerseType, index: number) => {
-            return <SingleVerse key={verse._id} index={index} {...verse} />
-          })}
+        <div className='verse-list'>
+          {visibleVerses.map((verse: VerseType, index: number) => (
+            <SingleVerse key={verse._id} index={index} {...verse} />
+          ))}
         </div>
       )}
     </div>

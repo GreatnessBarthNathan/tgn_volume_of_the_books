@@ -3,11 +3,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const http_status_codes_1 = require("http-status-codes");
 // Custom Error Handler Middleware
 const errorHandler = (err, // Use `any` because errors can have varying structures
-req, res, next) => {
+_req, res) => {
     // Default custom error structure
     const customError = {
         statusCode: err.statusCode || http_status_codes_1.StatusCodes.INTERNAL_SERVER_ERROR,
-        msg: err.message || "Something went wrong, please try again later",
+        msg: err.statusCode && err.message
+            ? err.message
+            : "Something went wrong, please try again later",
     };
     // Handle Mongoose Duplicate Key Error
     if (err.code && err.code === 11000) {
@@ -23,8 +25,6 @@ req, res, next) => {
     }
     // Send error response
     res.status(customError.statusCode).json({ msg: customError.msg });
-    // Call `next` in case other middlewares are chained after
-    next();
 };
 exports.default = errorHandler;
 //# sourceMappingURL=errorHandler.js.map

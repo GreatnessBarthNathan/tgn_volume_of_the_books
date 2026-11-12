@@ -9,8 +9,9 @@ export type ChapterType = {
   _id: string
   name: string
   word: string
-  declaratioin: string
+  declaration: string
   book: number
+  date?: string
 }
 
 export type VerseType = {

@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react"
+import { FormEvent, useState } from "react"
 import { useCreateVerse } from "../queries/verses"
 import { toast } from "react-toastify"
 import { isAxiosError } from "axios"
@@ -6,35 +6,30 @@ import { isAxiosError } from "axios"
 function CreateVerse() {
   const [date, setDate] = useState("")
   const [prophecy, setProphecy] = useState("")
-  const { mutate, isSuccess, isError, error, isLoading } = useCreateVerse()
+  const { mutate, isLoading } = useCreateVerse()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const data = Object.fromEntries(formData)
-    mutate(data)
+    mutate(data, {
+      onSuccess: () => {
+        toast.success("Verse created. Create another verse?")
+        setDate("")
+        setProphecy("")
+      },
+      onError: (error) =>
+        toast.error(
+          isAxiosError(error)
+            ? error.response?.data?.msg || "Unable to create verse"
+            : "Unable to create verse"
+        ),
+    })
   }
-
-  const responses = () => {
-    if (isSuccess) {
-      toast.success("Verse created. Create another verse?")
-      setDate("")
-      setProphecy("")
-    }
-    if (isError) {
-      if (isAxiosError(error)) {
-        toast.error(error?.response?.data?.msg)
-      }
-    }
-  }
-
-  useEffect(() => {
-    responses()
-  }, [isError, isSuccess])
   return (
     <main>
       <form
-        className='m-auto mt-10 w-[90%] md:w-[40%] border p-5 border-[var(--primaryColor)] text-[var(--primaryText)] rounded-md'
+        className='form-card'
         onSubmit={handleSubmit}
       >
         <h1 className='capitalize mb-2 text-center text-[var(--primaryColor)] font-semibold'>

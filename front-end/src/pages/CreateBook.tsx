@@ -1,4 +1,4 @@
-import { FormEvent, useEffect } from "react"
+import { FormEvent } from "react"
 import { useCreateBook } from "../queries/books"
 import { toast } from "react-toastify"
 import { isAxiosError } from "axios"
@@ -6,34 +6,29 @@ import { useNavigate } from "react-router-dom"
 
 function CreateBook() {
   const navigate = useNavigate()
-  const { mutate, isSuccess, isError, error } = useCreateBook()
+  const { mutate, isLoading } = useCreateBook()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const data = Object.fromEntries(formData)
-    mutate(data)
+    mutate(data, {
+      onSuccess: () => {
+        toast.success("Book created")
+        navigate("/")
+      },
+      onError: (error) =>
+        toast.error(
+          isAxiosError(error)
+            ? error.response?.data?.msg || "Unable to create book"
+            : "Unable to create book"
+        ),
+    })
   }
-
-  const responses = () => {
-    if (isSuccess) {
-      toast.success("data created")
-      navigate("/")
-    }
-    if (isError) {
-      if (isAxiosError(error)) {
-        toast.error(error?.response?.data?.msg)
-      }
-    }
-  }
-
-  useEffect(() => {
-    responses()
-  }, [isError, isSuccess])
   return (
     <main className='pb-10'>
       <form
-        className='m-auto mt-10 w-[90%] md:w-[40%] border p-5 border-[var(--primaryColor)] rounded-md text-[var(--primaryText)]'
+        className='form-card'
         onSubmit={handleSubmit}
       >
         <h1 className='capitalize mb-2 text-center text-[var(--primaryColor)] font-semibold'>
@@ -74,9 +69,10 @@ function CreateBook() {
         </div>
         <button
           type='submit'
-          className='border p-1 w-full bg-[var(--primaryColor)] rounded-sm text-white capitalize'
+          disabled={isLoading}
+          className='border p-1 w-full bg-[var(--primaryColor)] rounded-sm text-white capitalize disabled:opacity-60'
         >
-          submit
+          {isLoading ? "submitting" : "submit"}
         </button>
       </form>
     </main>

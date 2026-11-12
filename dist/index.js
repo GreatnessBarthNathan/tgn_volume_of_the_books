@@ -55,33 +55,53 @@ const morgan_1 = __importDefault(require("morgan"));
 const helmet_1 = __importDefault(require("helmet"));
 const express_mongo_sanitize_1 = __importDefault(require("express-mongo-sanitize"));
 const app = (0, express_1.default)();
+const frontendPath = path_1.default.resolve(__dirname, "../front-end/dist");
 // middlewares
 const errorHandler_1 = __importDefault(require("./middleware/errorHandler"));
 // routers
 const bookRoute_1 = __importDefault(require("./routes/bookRoute"));
 const chapterRoute_1 = __importDefault(require("./routes/chapterRoute"));
 const verseRoute_1 = __importDefault(require("./routes/verseRoute"));
+const authRoute_1 = __importDefault(require("./routes/authRoute"));
+const adminAccount_1 = __importDefault(require("./models/adminAccount"));
+const adminAuth_1 = require("./utils/adminAuth");
 if (process.env.NODE_ENV === "development") {
     app.use((0, morgan_1.default)("dev"));
 }
-app.use(express_1.default.static(path_1.default.resolve(__dirname, "./public")));
 app.use((0, helmet_1.default)());
-app.use((0, express_mongo_sanitize_1.default)());
 app.use(express_1.default.json());
+app.use((0, express_mongo_sanitize_1.default)());
+app.use(express_1.default.static(frontendPath));
+app.use("/api/v1/auth", authRoute_1.default);
 app.use("/api/v1/book", bookRoute_1.default);
 app.use("/api/v1/chapter", chapterRoute_1.default);
 app.use("/api/v1/verse", verseRoute_1.default);
-app.get("*", (req, res) => {
-    res.sendFile(path_1.default.resolve(__dirname, "./public", "index.html"));
-});
-app.use("*", (req, res) => {
+app.use("/api", (_req, res) => {
     res.status(404).json({ msg: "not found" });
+});
+app.get("*", (req, res) => {
+    res.sendFile(path_1.default.join(frontendPath, "index.html"));
 });
 app.use(errorHandler_1.default);
 const port = process.env.PORT || 5000;
 const start = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield mongoose_1.default.connect(process.env.MONGO_URL);
+        (0, adminAuth_1.validateAuthConfig)();
+        const mongoUrl = process.env.MONGO_URL;
+        const adminUsername = process.env.ADMIN_USERNAME;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+        if (!mongoUrl)
+            throw new Error("MONGO_URL must be configured");
+        if (!adminUsername || !adminPassword) {
+            throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD must be configured");
+        }
+        yield mongoose_1.default.connect(mongoUrl);
+        yield adminAccount_1.default.updateOne({ username: adminUsername.toLowerCase() }, {
+            $setOnInsert: {
+                username: adminUsername.toLowerCase(),
+                passwordHash: (0, adminAuth_1.hashPassword)(adminPassword),
+            },
+        }, { upsert: true });
         app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
             console.log("connected to DB");
             console.log("server listening on port " + port);
@@ -89,6 +109,7 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
     }
     catch (error) {
         console.log(error);
+        process.exitCode = 1;
     }
 });
 start();

@@ -43,7 +43,7 @@ const editBook = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const existingBook = yield book_1.default.findOne({ year: req.params.id });
     if (!existingBook)
         throw new customErrors_1.NotFoundError("this book does not exist");
-    const book = yield book_1.default.findOneAndUpdate({ year: req.body.year }, req.body, {
+    const book = yield book_1.default.findOneAndUpdate({ year: req.params.id }, req.body, {
         runValidators: true,
         new: true,
     });

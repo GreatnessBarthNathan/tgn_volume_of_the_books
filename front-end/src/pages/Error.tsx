@@ -9,16 +9,16 @@ function Error() {
 
     if (status === 404) {
       return (
-        <div className='w-full h-[80dvh] flex items-center justify-center'>
-          <div className='w-[300px] md:w-[400px] text-center'>
-            <img src='/error_img.svg' alt='error image' />
-            <h2 className='text-2xl mt-5 text-slate-500'>Page Not Found</h2>
-            <p className='mt-5 text-slate-500'>
+        <div className='empty-state'>
+          <div className='m-auto max-w-[360px]'>
+            <img className='mx-auto mb-5 w-36' src='/error_img.svg' alt='' />
+            <h2 className='section-title'>Page not found</h2>
+            <p className='mt-3 text-[var(--primaryText)]'>
               Seems you are looking for the wrong page
             </p>
-            <h2 className='text-cyan-700 text-xl'>
-              <Link to='/'>Back Home</Link>
-            </h2>
+            <Link to='/' className='nav-link nav-link-primary mt-5'>
+              Back to the archive
+            </Link>
           </div>
         </div>
       )
@@ -26,8 +26,12 @@ function Error() {
   }
 
   return (
-    <div className='w-full'>
-      <h1 className='text-center mt-[50px] text-2xl'>Something went wrong</h1>
+    <div className='error-state'>
+      <h1 className='section-title'>Something went wrong</h1>
+      <p className='mt-3'>Please return to the archive and try again.</p>
+      <Link to='/' className='nav-link nav-link-primary mt-5'>
+        Back to the archive
+      </Link>
     </div>
   )
 }

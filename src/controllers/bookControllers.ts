@@ -31,7 +31,7 @@ export const editBook = async (req: Request, res: Response) => {
   const existingBook = await Book.findOne({ year: req.params.id })
   if (!existingBook) throw new NotFoundError("this book does not exist")
 
-  const book = await Book.findOneAndUpdate({ year: req.body.year }, req.body, {
+  const book = await Book.findOneAndUpdate({ year: req.params.id }, req.body, {
     runValidators: true,
     new: true,
   })

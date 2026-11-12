@@ -34,10 +34,11 @@ export const editVerse = async (req: Request, res: Response) => {
   const { date, prophecy } = req.body
   if (!date || !prophecy) throw new BadRequestError("please provide all values")
   const chapter = months[new Date(date).getMonth()]
+  const book = Number(new Date(date).getFullYear())
 
   const verse = await Verse.findOneAndUpdate(
     { _id: req.params.id },
-    { ...req.body, chapter },
+    { ...req.body, book, chapter },
     {
       runValidators: true,
       new: true,

@@ -48,7 +48,8 @@ const editVerse = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (!date || !prophecy)
         throw new customErrors_1.BadRequestError("please provide all values");
     const chapter = constants_1.months[new Date(date).getMonth()];
-    const verse = yield verse_1.default.findOneAndUpdate({ _id: req.params.id }, Object.assign(Object.assign({}, req.body), { chapter }), {
+    const book = Number(new Date(date).getFullYear());
+    const verse = yield verse_1.default.findOneAndUpdate({ _id: req.params.id }, Object.assign(Object.assign({}, req.body), { book, chapter }), {
         runValidators: true,
         new: true,
     });

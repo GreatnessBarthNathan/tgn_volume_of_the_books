@@ -6,17 +6,18 @@ import {
   editChapter,
   deleteChapter,
 } from "../controllers/chapterControllers"
+import requireAdmin from "../middleware/requireAdmin"
 
 const router = Router()
-
-router.post("/", createChapter)
 
 router.get("/single-chapter/:id", singleChapter)
 
 router.get("/:id", getChapters)
 
-router.patch("/:id", editChapter)
+router.post("/", requireAdmin, createChapter)
 
-router.delete("/:id", deleteChapter)
+router.patch("/:id", requireAdmin, editChapter)
+
+router.delete("/:id", requireAdmin, deleteChapter)
 
 export default router

@@ -6,17 +6,18 @@ import {
   editVerse,
   deleteVerse,
 } from "../controllers/verseControllers"
+import requireAdmin from "../middleware/requireAdmin"
 
 const router = Router()
-
-router.post("/", createVerse)
 
 router.get("/single-verse/:id", singleVerse)
 
 router.get("/:id", getVerses)
 
-router.patch("/:id", editVerse)
+router.post("/", requireAdmin, createVerse)
 
-router.delete("/:id", deleteVerse)
+router.patch("/:id", requireAdmin, editVerse)
+
+router.delete("/:id", requireAdmin, deleteVerse)
 
 export default router

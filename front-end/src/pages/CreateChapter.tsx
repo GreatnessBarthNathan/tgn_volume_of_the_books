@@ -1,4 +1,4 @@
-import { FormEvent, useEffect, useState } from "react"
+import { FormEvent, useState } from "react"
 import { useCreateChapter } from "../queries/chapters"
 import { toast } from "react-toastify"
 import { isAxiosError } from "axios"
@@ -7,37 +7,32 @@ function CreateChapter() {
   const [date, setDate] = useState("")
   const [word, setWord] = useState("")
   const [declaration, setDeclaration] = useState("")
-  const { mutate, isSuccess, isError, error, isLoading } = useCreateChapter()
+  const { mutate, isLoading } = useCreateChapter()
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const data = Object.fromEntries(formData)
-    mutate(data)
+    mutate(data, {
+      onSuccess: () => {
+        toast.success("Chapter created. Create another chapter")
+        setDate("")
+        setWord("")
+        setDeclaration("")
+      },
+      onError: (error) =>
+        toast.error(
+          isAxiosError(error)
+            ? error.response?.data?.msg || "Unable to create chapter"
+            : "Unable to create chapter"
+        ),
+    })
   }
-
-  const responses = () => {
-    if (isSuccess) {
-      toast.success("Chapter created. Create another chapter")
-      setDate("")
-      setWord("")
-      setDeclaration("")
-    }
-    if (isError) {
-      if (isAxiosError(error)) {
-        toast.error(error?.response?.data?.msg)
-      }
-    }
-  }
-
-  useEffect(() => {
-    responses()
-  }, [isError, isSuccess])
 
   return (
     <main className='mb-10'>
       <form
-        className='m-auto mt-10 w-[90%] md:w-[40%] border p-5 border-[var(--primaryColor)] rounded-md text-[var(--primaryText)]'
+        className='form-card'
         onSubmit={handleSubmit}
       >
         <h1 className='capitalize mb-2 text-center text-[var(--primaryColor)] font-semibold'>

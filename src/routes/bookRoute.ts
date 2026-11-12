@@ -6,17 +6,18 @@ import {
   editBook,
   deleteBook,
 } from "../controllers/bookControllers"
+import requireAdmin from "../middleware/requireAdmin"
 
 const router = Router()
-
-router.post("/", createBook)
 
 router.get("/", getBooks)
 
 router.get("/:id", singleBook)
 
-router.patch("/:id", editBook)
+router.post("/", requireAdmin, createBook)
 
-router.delete("/:id", deleteBook)
+router.patch("/:id", requireAdmin, editBook)
+
+router.delete("/:id", requireAdmin, deleteBook)
 
 export default router

@@ -1,44 +1,51 @@
-import { FormEvent, useEffect } from "react"
+import { FormEvent } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { isAxiosError } from "axios"
 import { useEditBook, useGetBook } from "../queries/books"
+import Loading from "../components/Loading"
 
 function EditBook() {
   const navigate = useNavigate()
   const { id } = useParams()
 
-  const { mutate, isSuccess, isError, error } = useEditBook()
+  const { mutate, isLoading } = useEditBook()
 
-  const { data } = useGetBook(Number(id))
+  const { data, isLoading: isBookLoading, isError: isBookError } = useGetBook(
+    Number(id)
+  )
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     const data = Object.fromEntries(formData)
 
-    mutate({ param: id as string, data })
-  }
-
-  const responses = () => {
-    if (isSuccess) {
-      toast.success("data updated")
-      navigate(`/`)
-    }
-    if (isError) {
-      if (isAxiosError(error)) {
-        toast.error(error?.response?.data?.msg)
+    mutate(
+      { param: id as string, data },
+      {
+        onSuccess: () => {
+          toast.success("Book updated")
+          navigate("/")
+        },
+        onError: (error) =>
+          toast.error(
+            isAxiosError(error)
+              ? error.response?.data?.msg || "Unable to update book"
+              : "Unable to update book"
+          ),
       }
-    }
+    )
   }
 
-  useEffect(() => {
-    responses()
-  }, [isError, isSuccess])
+  if (isBookLoading) return <Loading />
+  if (isBookError || !data) {
+    return <h2 className='text-center'>Book not found</h2>
+  }
+
   return (
     <main>
       <form
-        className='m-auto mt-10 w-[90%] md:w-[40%] border p-5 border-[var(--primaryColor)] text-[var(--primaryText)] rounded-md'
+        className='form-card'
         onSubmit={handleSubmit}
       >
         <h1 className='capitalize mb-2 text-center text-[var(--primaryColor)] font-semibold'>
@@ -85,9 +92,10 @@ function EditBook() {
 
         <button
           type='submit'
+          disabled={isLoading}
           className='border p-1 w-full bg-[var(--primaryColor)] rounded-sm text-white capitalize'
         >
-          submit
+          {isLoading ? "submitting" : "submit"}
         </button>
       </form>
     </main>

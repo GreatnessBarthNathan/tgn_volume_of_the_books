@@ -9,6 +9,7 @@ import helmet from "helmet"
 import ExpressMongoSanitize from "express-mongo-sanitize"
 
 const app = express()
+const frontendPath = path.resolve(__dirname, "../front-end/dist")
 
 // middlewares
 import errorHandler from "./middleware/errorHandler"
@@ -17,28 +18,32 @@ import errorHandler from "./middleware/errorHandler"
 import bookRouter from "./routes/bookRoute"
 import chapterRouter from "./routes/chapterRoute"
 import verseRouter from "./routes/verseRoute"
+import authRouter from "./routes/authRoute"
+import searchRouter from "./routes/searchRoute"
+import AdminAccount from "./models/adminAccount"
+import { hashPassword, validateAuthConfig } from "./utils/adminAuth"
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"))
 }
 
-app.use(express.static(path.resolve(__dirname, "./public")))
-
 app.use(helmet())
-app.use(ExpressMongoSanitize())
-
 app.use(express.json())
+app.use(ExpressMongoSanitize())
+app.use(express.static(frontendPath))
 
+app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/search", searchRouter)
 app.use("/api/v1/book", bookRouter)
 app.use("/api/v1/chapter", chapterRouter)
 app.use("/api/v1/verse", verseRouter)
 
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "./public", "index.html"))
+app.use("/api", (_req, res) => {
+  res.status(404).json({ msg: "not found" })
 })
 
-app.use("*", (req, res) => {
-  res.status(404).json({ msg: "not found" })
+app.get("*", (req, res) => {
+  res.sendFile(path.join(frontendPath, "index.html"))
 })
 
 app.use(errorHandler)
@@ -46,13 +51,33 @@ app.use(errorHandler)
 const port = process.env.PORT || 5000
 const start = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URL as string)
+    validateAuthConfig()
+    const mongoUrl = process.env.MONGO_URL
+    const adminUsername = process.env.ADMIN_USERNAME
+    const adminPassword = process.env.ADMIN_PASSWORD
+    if (!mongoUrl) throw new Error("MONGO_URL must be configured")
+    if (!adminUsername || !adminPassword) {
+      throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD must be configured")
+    }
+
+    await mongoose.connect(mongoUrl)
+    if ((await AdminAccount.countDocuments()) === 0) {
+      await AdminAccount.create({
+        username: adminUsername.toLowerCase(),
+        passwordHash: hashPassword(adminPassword),
+      })
+    }
+    await AdminAccount.updateMany(
+      { authVersion: { $exists: false } },
+      { $set: { authVersion: 0 } }
+    )
     app.listen(port, async () => {
       console.log("connected to DB")
       console.log("server listening on port " + port)
     })
   } catch (error) {
     console.log(error)
+    process.exitCode = 1
   }
 }
 
