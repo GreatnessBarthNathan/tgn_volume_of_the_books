@@ -16,6 +16,18 @@ const AdminAccountSchema = new mongoose_1.default.Schema({
         type: String,
         required: true,
     },
+    authVersion: {
+        type: Number,
+        default: 0,
+    },
+    recoveryCodeHash: {
+        type: String,
+        select: false,
+    },
+    recoveryCodeExpiresAt: {
+        type: Date,
+        select: false,
+    },
 });
 exports.default = mongoose_1.default.model("AdminAccount", AdminAccountSchema);
 //# sourceMappingURL=adminAccount.js.map

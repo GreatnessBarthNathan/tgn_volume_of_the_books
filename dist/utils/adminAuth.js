@@ -50,12 +50,16 @@ const validateAuthConfig = () => {
         process.env.ADMIN_PASSWORD.length > 128) {
         throw new Error("ADMIN_PASSWORD must be between 12 and 128 characters long");
     }
+    if (process.env.ADMIN_MASTER_RECOVERY_CODE &&
+        process.env.ADMIN_MASTER_RECOVERY_CODE.length < 32) {
+        throw new Error("ADMIN_MASTER_RECOVERY_CODE must be at least 32 characters long");
+    }
 };
 exports.validateAuthConfig = validateAuthConfig;
 const sign = (payload) => (0, crypto_1.createHmac)("sha256", sessionSecret()).update(payload).digest("base64url");
-const createAdminSession = (username) => {
+const createAdminSession = (username, authVersion) => {
     const expiresAt = Math.floor(Date.now() / 1000) + sessionDays() * 86400;
-    const payload = Buffer.from(JSON.stringify({ username, expiresAt })).toString("base64url");
+    const payload = Buffer.from(JSON.stringify({ username, authVersion, expiresAt })).toString("base64url");
     return {
         value: `${payload}.${sign(payload)}`,
         maxAge: sessionDays() * 86400 * 1000,
@@ -79,11 +83,17 @@ const readAdminSession = (cookieHeader) => {
     try {
         const session = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
         if (typeof session.username !== "string" ||
+            typeof session.authVersion !== "number" ||
+            !Number.isInteger(session.authVersion) ||
+            session.authVersion < 0 ||
             typeof session.expiresAt !== "number" ||
             session.expiresAt <= Math.floor(Date.now() / 1000)) {
             return null;
         }
-        return session.username;
+        return {
+            username: session.username,
+            authVersion: session.authVersion,
+        };
     }
     catch (_a) {
         return null;

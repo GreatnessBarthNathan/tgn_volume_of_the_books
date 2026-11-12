@@ -63,6 +63,7 @@ const bookRoute_1 = __importDefault(require("./routes/bookRoute"));
 const chapterRoute_1 = __importDefault(require("./routes/chapterRoute"));
 const verseRoute_1 = __importDefault(require("./routes/verseRoute"));
 const authRoute_1 = __importDefault(require("./routes/authRoute"));
+const searchRoute_1 = __importDefault(require("./routes/searchRoute"));
 const adminAccount_1 = __importDefault(require("./models/adminAccount"));
 const adminAuth_1 = require("./utils/adminAuth");
 if (process.env.NODE_ENV === "development") {
@@ -73,6 +74,7 @@ app.use(express_1.default.json());
 app.use((0, express_mongo_sanitize_1.default)());
 app.use(express_1.default.static(frontendPath));
 app.use("/api/v1/auth", authRoute_1.default);
+app.use("/api/v1/search", searchRoute_1.default);
 app.use("/api/v1/book", bookRoute_1.default);
 app.use("/api/v1/chapter", chapterRoute_1.default);
 app.use("/api/v1/verse", verseRoute_1.default);
@@ -96,12 +98,13 @@ const start = () => __awaiter(void 0, void 0, void 0, function* () {
             throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD must be configured");
         }
         yield mongoose_1.default.connect(mongoUrl);
-        yield adminAccount_1.default.updateOne({ username: adminUsername.toLowerCase() }, {
-            $setOnInsert: {
+        if ((yield adminAccount_1.default.countDocuments()) === 0) {
+            yield adminAccount_1.default.create({
                 username: adminUsername.toLowerCase(),
                 passwordHash: (0, adminAuth_1.hashPassword)(adminPassword),
-            },
-        }, { upsert: true });
+            });
+        }
+        yield adminAccount_1.default.updateMany({ authVersion: { $exists: false } }, { $set: { authVersion: 0 } });
         app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
             console.log("connected to DB");
             console.log("server listening on port " + port);

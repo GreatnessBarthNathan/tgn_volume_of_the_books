@@ -52,10 +52,12 @@ npm run dev
 For production, build the frontend and backend, then start the server:
 
 ```sh
-npm --prefix front-end run build
 npm run build
 npm start
 ```
 
-The server serves the frontend from `front-end/dist`, so build the frontend
-before starting the production server.
+The build command installs the frontend dependencies from its lockfile and
+builds the frontend and backend. On Railway, deploy from the repository root
+with `npm run build` as the build command and `npm start` as the start command.
+Add the required server environment variables from the Configuration table to
+the Railway service. The server serves the frontend from `front-end/dist`.

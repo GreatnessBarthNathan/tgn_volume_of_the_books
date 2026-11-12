@@ -10,6 +10,9 @@ const router = (0, express_1.Router)();
 router.post("/login", authControllers_1.loginAdmin);
 router.get("/session", authControllers_1.getAdminSession);
 router.post("/logout", authControllers_1.logoutAdmin);
-router.post("/accounts", requireAdmin_1.default, authControllers_1.createAdminAccount);
+router.post("/accounts/invitations", requireAdmin_1.default, authControllers_1.createAdminInvitation);
+router.post("/accounts/recovery-codes", requireAdmin_1.default, authControllers_1.createAdminRecoveryCode);
+router.post("/accounts/accept-invitation", authControllers_1.acceptAdminInvitation);
+router.post("/recover", authControllers_1.recoverAdminAccount);
 exports.default = router;
 //# sourceMappingURL=authRoute.js.map

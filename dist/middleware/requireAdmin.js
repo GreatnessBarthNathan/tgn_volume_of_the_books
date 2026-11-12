@@ -16,10 +16,13 @@ const customErrors_1 = require("../errors/customErrors");
 const adminAuth_1 = require("../utils/adminAuth");
 const adminAccount_1 = __importDefault(require("../models/adminAccount"));
 const requireAdmin = (req, _res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const username = (0, adminAuth_1.readAdminSession)(req.headers.cookie);
-    if (!username)
+    const session = (0, adminAuth_1.readAdminSession)(req.headers.cookie);
+    if (!session)
         throw new customErrors_1.UnauthorizedError("Admin sign-in required");
-    const account = yield adminAccount_1.default.findOne({ username }).select("_id");
+    const account = yield adminAccount_1.default.findOne({
+        username: session.username,
+        authVersion: session.authVersion,
+    }).select("_id");
     if (!account)
         throw new customErrors_1.UnauthorizedError("Admin sign-in required");
     next();
