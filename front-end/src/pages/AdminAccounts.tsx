@@ -66,7 +66,7 @@ function AdminAccounts() {
 
   const createRecoveryCode = () => {
     setRecoveryCode("")
-    recoveryMutation.mutate(recoveryUsername, {
+    recoveryMutation.mutate(recoveryUsername.trim(), {
       onSuccess: ({ token, expiresAt: codeExpiresAt }) => {
         setRecoveryCode(token)
         setRecoveryExpiresAt(new Date(codeExpiresAt).toLocaleString())
@@ -135,9 +135,6 @@ function AdminAccounts() {
           id='recovery-username'
           value={recoveryUsername}
           onChange={(event) => setRecoveryUsername(event.target.value)}
-          minLength={3}
-          maxLength={32}
-          pattern='[a-zA-Z0-9._-]+'
           required
           className='mb-3 border p-1 w-full border-[var(--primaryColor)] rounded-sm outline-none'
         />
@@ -146,7 +143,7 @@ function AdminAccounts() {
           onClick={createRecoveryCode}
           disabled={
             recoveryMutation.isLoading ||
-            !/^[a-zA-Z0-9._-]{3,32}$/.test(recoveryUsername)
+            !/^[a-zA-Z0-9._-]{3,32}$/.test(recoveryUsername.trim())
           }
           className='border p-1 w-full bg-[var(--primaryColor)] rounded-sm text-white disabled:opacity-60'
         >

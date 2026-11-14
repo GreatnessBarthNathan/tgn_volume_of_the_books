@@ -1,10 +1,11 @@
-import { FormEvent, useEffect } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { isAxiosError } from "axios"
 import { Link, Navigate, useLocation, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { useAdminSession, useLoginAdmin } from "../queries/auth"
 
 function AdminLogin() {
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const location = useLocation()
   const { data: admin } = useAdminSession()
@@ -58,14 +59,25 @@ function AdminLogin() {
         <label className='block capitalize font-semibold' htmlFor='password'>
           Password
         </label>
-        <input
-          id='password'
-          name='password'
-          type='password'
-          autoComplete='current-password'
-          required
-          className='mb-4 border p-1 w-full border-[var(--primaryColor)] rounded-sm outline-none'
-        />
+        <div className='relative mb-4'>
+          <input
+            id='password'
+            name='password'
+            type={showPassword ? "text" : "password"}
+            autoComplete='current-password'
+            required
+            className='border p-1 pr-14 w-full border-[var(--primaryColor)] rounded-sm outline-none'
+          />
+          <button
+            type='button'
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword(!showPassword)}
+            className='absolute right-2 top-1/2 -translate-y-1/2 text-sm text-[var(--primaryColor)] underline'
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
         <button
           type='submit'
           disabled={isLoading}

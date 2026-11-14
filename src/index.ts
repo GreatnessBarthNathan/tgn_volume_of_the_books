@@ -21,7 +21,11 @@ import verseRouter from "./routes/verseRoute"
 import authRouter from "./routes/authRoute"
 import searchRouter from "./routes/searchRoute"
 import AdminAccount from "./models/adminAccount"
-import { hashPassword, validateAuthConfig } from "./utils/adminAuth"
+import {
+  hashPassword,
+  normalizeUsername,
+  validateAuthConfig,
+} from "./utils/adminAuth"
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"))
@@ -63,7 +67,7 @@ const start = async () => {
     await mongoose.connect(mongoUrl)
     if ((await AdminAccount.countDocuments()) === 0) {
       await AdminAccount.create({
-        username: adminUsername.toLowerCase(),
+        username: normalizeUsername(adminUsername),
         passwordHash: hashPassword(adminPassword),
       })
     }

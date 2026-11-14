@@ -1,10 +1,11 @@
-import { FormEvent, useEffect } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { isAxiosError } from "axios"
 import { Link, useNavigate } from "react-router-dom"
 import { toast } from "react-toastify"
 import { useRecoverAdminAccount } from "../queries/auth"
 
 function AdminRecovery() {
+  const [showPassword, setShowPassword] = useState(false)
   const navigate = useNavigate()
   const { mutate, isLoading, isError, error, isSuccess } =
     useRecoverAdminAccount()
@@ -62,9 +63,6 @@ function AdminRecovery() {
         <input
           id='username'
           name='username'
-          minLength={3}
-          maxLength={32}
-          pattern='[a-zA-Z0-9._-]+'
           autoComplete='username'
           required
           className='mb-3 border p-1 w-full border-[var(--primaryColor)] rounded-sm outline-none'
@@ -72,16 +70,25 @@ function AdminRecovery() {
         <label className='block font-semibold' htmlFor='password'>
           New password (12-128 characters)
         </label>
-        <input
-          id='password'
-          name='password'
-          type='password'
-          maxLength={128}
-          minLength={12}
-          autoComplete='new-password'
-          required
-          className='mb-4 border p-1 w-full border-[var(--primaryColor)] rounded-sm outline-none'
-        />
+        <div className='relative mb-4'>
+          <input
+            id='password'
+            name='password'
+            type={showPassword ? "text" : "password"}
+            autoComplete='new-password'
+            required
+            className='border p-1 pr-14 w-full border-[var(--primaryColor)] rounded-sm outline-none'
+          />
+          <button
+            type='button'
+            aria-label={showPassword ? "Hide password" : "Show password"}
+            aria-pressed={showPassword}
+            onClick={() => setShowPassword(!showPassword)}
+            className='absolute right-2 top-1/2 -translate-y-1/2 text-sm text-[var(--primaryColor)] underline'
+          >
+            {showPassword ? "Hide" : "Show"}
+          </button>
+        </div>
         <button
           type='submit'
           disabled={isLoading}

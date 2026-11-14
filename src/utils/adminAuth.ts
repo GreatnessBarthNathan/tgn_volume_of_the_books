@@ -9,6 +9,9 @@ const SESSION_COOKIE = "admin_session"
 const HASH_SALT_BYTES = 16
 const HASH_KEY_BYTES = 64
 
+export const normalizeUsername = (username: string) =>
+  username.trim().toLowerCase()
+
 const sessionSecret = () => {
   const secret = process.env.AUTH_SESSION_SECRET
   if (!secret) throw new Error("AUTH_SESSION_SECRET must be configured")
@@ -17,7 +20,7 @@ const sessionSecret = () => {
 
 export const hashPassword = (password: string) => {
   const salt = randomBytes(HASH_SALT_BYTES).toString("hex")
-  const hash = scryptSync(password, salt, HASH_KEY_BYTES).toString("hex")
+  const hash = scryptSync(password.trim(), salt, HASH_KEY_BYTES).toString("hex")
   return `${salt}:${hash}`
 }
 
@@ -25,7 +28,7 @@ export const verifyPassword = (password: string, storedHash: string) => {
   const [salt, expectedHash] = storedHash.split(":")
   if (!salt || !expectedHash) return false
 
-  const actualHash = scryptSync(password, salt, HASH_KEY_BYTES)
+  const actualHash = scryptSync(password.trim(), salt, HASH_KEY_BYTES)
   const expected = Buffer.from(expectedHash, "hex")
   return (
     actualHash.length === expected.length &&
@@ -46,15 +49,17 @@ export const validateAuthConfig = () => {
     throw new Error("AUTH_SESSION_SECRET must be at least 32 characters long")
   }
   sessionDays()
-  if (!process.env.ADMIN_USERNAME || !process.env.ADMIN_PASSWORD) {
+  const username = process.env.ADMIN_USERNAME?.trim()
+  const password = process.env.ADMIN_PASSWORD?.trim()
+  if (!username || !password) {
     throw new Error("ADMIN_USERNAME and ADMIN_PASSWORD must be configured")
   }
-  if (!/^[a-zA-Z0-9._-]{3,32}$/.test(process.env.ADMIN_USERNAME)) {
+  if (!/^[a-zA-Z0-9._-]{3,32}$/.test(username)) {
     throw new Error("ADMIN_USERNAME must be 3-32 letters, numbers, '.', '_' or '-'")
   }
   if (
-    process.env.ADMIN_PASSWORD.length < 12 ||
-    process.env.ADMIN_PASSWORD.length > 128
+    password.length < 12 ||
+    password.length > 128
   ) {
     throw new Error("ADMIN_PASSWORD must be between 12 and 128 characters long")
   }

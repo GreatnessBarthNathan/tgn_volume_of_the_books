@@ -12,6 +12,7 @@ import {
   clearAdminSessionCookie,
   createAdminSession,
   hashPassword,
+  normalizeUsername,
   verifyPassword,
 } from "../utils/adminAuth"
 import { readAdminSession } from "../utils/adminAuth"
@@ -21,15 +22,15 @@ export const loginAdmin = async (req: Request, res: Response) => {
   if (
     typeof username !== "string" ||
     typeof password !== "string" ||
-    !/^[a-zA-Z0-9._-]{3,32}$/.test(username) ||
-    password.length < 1 ||
-    password.length > 128
+    !/^[a-zA-Z0-9._-]{3,32}$/.test(normalizeUsername(username)) ||
+    password.trim().length < 1 ||
+    password.trim().length > 128
   ) {
     throw new BadRequestError("Please provide a username and password")
   }
 
   const account = await AdminAccount.findOne({
-    username: username.trim().toLowerCase(),
+    username: normalizeUsername(username),
   })
   if (!account || !verifyPassword(password, account.passwordHash)) {
     throw new UnauthorizedError("Invalid username or password")
@@ -79,7 +80,7 @@ export const createAdminRecoveryCode = async (req: Request, res: Response) => {
   const { username } = req.body ?? {}
   if (
     typeof username !== "string" ||
-    !/^[a-zA-Z0-9._-]{3,32}$/.test(username)
+    !/^[a-zA-Z0-9._-]{3,32}$/.test(normalizeUsername(username))
   ) {
     throw new BadRequestError("Provide a valid admin username")
   }
@@ -87,7 +88,7 @@ export const createAdminRecoveryCode = async (req: Request, res: Response) => {
   const token = randomBytes(32).toString("hex")
   const expiresAt = new Date(Date.now() + 90 * 24 * 60 * 60 * 1000)
   const account = await AdminAccount.findOneAndUpdate(
-    { username: username.toLowerCase() },
+    { username: normalizeUsername(username) },
     {
       $set: {
         recoveryCodeHash: hashInvitationToken(token),
@@ -111,9 +112,9 @@ export const acceptAdminInvitation = async (req: Request, res: Response) => {
     !/^[a-f0-9]{64}$/.test(token) ||
     typeof username !== "string" ||
     typeof password !== "string" ||
-    !/^[a-zA-Z0-9._-]{3,32}$/.test(username) ||
-    password.length < 12 ||
-    password.length > 128
+    !/^[a-zA-Z0-9._-]{3,32}$/.test(normalizeUsername(username)) ||
+    password.trim().length < 12 ||
+    password.trim().length > 128
   ) {
     throw new BadRequestError(
       "Use a 3-32 character username and a password of 12-128 characters"
@@ -130,7 +131,7 @@ export const acceptAdminInvitation = async (req: Request, res: Response) => {
     throw new BadRequestError("This invitation is invalid, expired, or already used")
   }
 
-  const normalizedUsername = username.toLowerCase()
+  const normalizedUsername = normalizeUsername(username)
   const exists = await AdminAccount.exists({ username: normalizedUsername })
   if (exists) throw new BadRequestError("That username is already in use")
 
@@ -164,17 +165,17 @@ export const recoverAdminAccount = async (req: Request, res: Response) => {
     code.length < 1 ||
     code.length > 256 ||
     typeof username !== "string" ||
-    !/^[a-zA-Z0-9._-]{3,32}$/.test(username) ||
+    !/^[a-zA-Z0-9._-]{3,32}$/.test(normalizeUsername(username)) ||
     typeof password !== "string" ||
-    password.length < 12 ||
-    password.length > 128
+    password.trim().length < 12 ||
+    password.trim().length > 128
   ) {
     throw new BadRequestError(
       "Provide a recovery code, a 3-32 character username, and a password of 12-128 characters"
     )
   }
 
-  const normalizedUsername = username.toLowerCase()
+  const normalizedUsername = normalizeUsername(username)
   const masterCode = process.env.ADMIN_MASTER_RECOVERY_CODE
   const matchesMasterCode = masterCode
     ? timingSafeEqual(
